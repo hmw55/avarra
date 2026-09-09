@@ -10,8 +10,9 @@ Avarra currently requires:
 
 - Git
 - Java 21 JDK
-- Node.js
-- npm
+- Node.js and npm
+- Docker Engine
+- Docker Compose
 
 The backend uses the Maven Wrapper included in the repository, so a separate Maven installation is not required.
 
@@ -23,6 +24,8 @@ java -version
 javac -version
 node --version
 npm --version
+docker --version
+docker compose version
 ```
 
 Java and `javac` should report Java 21.
@@ -38,7 +41,7 @@ git clone git@github.com:hmw55/avarra.git
 # OR
 
 # HTTPS
-https://github.com/hmw55/avarra.git
+git clone https://github.com/hmw55/avarra.git
 
 cd avarra
 ```
@@ -56,7 +59,7 @@ cd backend
 
 The Maven Wrapper will download the required Maven version and project dependencies when necessary.
 
-Stop the backend with `Crtl+C`
+Stop the backend with `Ctrl+C`
 
 ### Frontend
 
@@ -80,7 +83,7 @@ Stop the frontend with `Ctrl+C`.
 
 ## Development Environment
 
-Avarra is currently developed using Visual Studio Code with the project and development tools running inside WSL Ubuntu or Arch Linux depending on the computer being used for development. 
+Avarra is developed and tested on Linux. Development is currently performed on Arch Linux and WSL Ubuntu using Visual Studio Code.
 
 ---
 
