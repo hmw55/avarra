@@ -84,6 +84,27 @@ Avarra is currently developed using Visual Studio Code with the project and deve
 
 ---
 
+## Environment Configuration and Secrets
+
+Avarra is a public repository. Secrets and environment-specific configuration must never be committed to source control.
+
+Use `.env.example` to document required environment variables with safe placeholder values. Store real local values in an ignored `.env` file or another appropriate local configuration source.
+
+Never commit: 
+
+- Passwords or database credentials
+- API keys or access tokens
+- Private keys
+- Authentication or session secrets
+- Production environment values
+- Sensitive user data
+
+Before committing changes, review staged files and confirm that no secrets or sensitive configuration are included. 
+
+If a secret is accidentally committed, treat it as exposed and rotate or revoke it immediately. Removing it in a later commit does not remove it from Git history.
+
+---
+
 ## Keeping This Guide Current
 
 When a new tool, service, environment variable, or other dependency becomes required to run Avarra locally, this guide should be updated as part of the same change. 
