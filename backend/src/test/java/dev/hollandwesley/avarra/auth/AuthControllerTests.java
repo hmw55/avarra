@@ -14,9 +14,20 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import org.springframework.security.authentication.AuthenticationManager;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.web.context.SecurityContextRepository;
+
+import org.springframework.security.core.context.SecurityContext;
+
+import static org.mockito.Mockito.verify;
 
 @WebMvcTest(AuthController.class)
 class AuthControllerTests {
@@ -26,6 +37,12 @@ class AuthControllerTests {
 
     @MockitoBean
     private UserRegistrationService registrationService;
+
+    @MockitoBean
+    private AuthenticationManager authenticationManager;
+
+    @MockitoBean
+    private SecurityContextRepository securityContextRepository;
 
     @Test
     void registersUserAndReturnsCreated() throws Exception {
@@ -90,5 +107,55 @@ class AuthControllerTests {
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.error").value("Conflict"))
                 .andExpect(jsonPath("$.message").value("Username is already in use"));
+    }
+
+    @Test
+    void logsInUserAndReturnsUsername() throws Exception {
+        Authentication authentication =
+                UsernamePasswordAuthenticationToken.authenticated(
+                        "Mack_98",
+                        null,
+                        java.util.List.of()
+                );
+
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(authentication);
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                "username": "mack_98",
+                                "password": "AvarraTestPassword123!"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("Mack_98"));
+
+        verify(securityContextRepository).saveContext(
+            any(SecurityContext.class), 
+            any(), 
+            any()
+        );
+    }
+
+    @Test
+    void rejectsInvalidLoginCredentials() throws Exception {
+        when(authenticationManager.authenticate(any()))
+                .thenThrow(new BadCredentialsException("Bad credentials"));
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                "username": "Mack_98",
+                                "password": "WrongPassword123!"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.error").value("Unauthorized"))
+                .andExpect(jsonPath("$.message")
+                        .value("Invalid username or password"));
     }
 }
