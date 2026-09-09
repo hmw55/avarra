@@ -15,4 +15,9 @@ public class PasswordConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public RecoveryCodeGenerator recoveryCodeGenerator() {
+        return new RecoveryCodeGenerator();
+    }
 }
