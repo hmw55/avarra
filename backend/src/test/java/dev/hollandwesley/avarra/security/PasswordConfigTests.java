@@ -3,6 +3,8 @@ package dev.hollandwesley.avarra.security;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import dev.hollandwesley.avarra.auth.security.PasswordConfig;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

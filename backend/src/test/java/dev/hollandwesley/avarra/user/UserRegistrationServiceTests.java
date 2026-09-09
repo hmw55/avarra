@@ -1,6 +1,13 @@
 package dev.hollandwesley.avarra.user;
 
-import dev.hollandwesley.avarra.security.RecoveryCodeGenerator;
+import dev.hollandwesley.avarra.auth.api.RegisterUserRequest;
+import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
+import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
+import dev.hollandwesley.avarra.auth.application.UsernameAlreadyExistsException;
+import dev.hollandwesley.avarra.auth.security.RecoveryCodeGenerator;
+import dev.hollandwesley.avarra.user.domain.User;
+import dev.hollandwesley.avarra.user.persistence.UserRepository;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

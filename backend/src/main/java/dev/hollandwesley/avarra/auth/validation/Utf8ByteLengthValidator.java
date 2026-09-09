@@ -1,4 +1,4 @@
-package dev.hollandwesley.avarra.validation;
+package dev.hollandwesley.avarra.auth.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

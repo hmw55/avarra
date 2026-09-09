@@ -1,4 +1,4 @@
-package dev.hollandwesley.avarra.user;
+package dev.hollandwesley.avarra.auth.application;
 
 /**
  * Thrown when registration attempts to use a username that is already taken.

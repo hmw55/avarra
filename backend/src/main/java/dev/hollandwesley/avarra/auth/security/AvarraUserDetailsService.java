@@ -1,7 +1,8 @@
-package dev.hollandwesley.avarra.security;
+package dev.hollandwesley.avarra.auth.security;
 
-import dev.hollandwesley.avarra.user.User;
-import dev.hollandwesley.avarra.user.UserRepository;
+import dev.hollandwesley.avarra.user.domain.User;
+import dev.hollandwesley.avarra.user.persistence.UserRepository;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,7 +1,8 @@
 package dev.hollandwesley.avarra.security;
 
-import dev.hollandwesley.avarra.user.RegisterUserResult;
-import dev.hollandwesley.avarra.user.UserRegistrationService;
+import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
+import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

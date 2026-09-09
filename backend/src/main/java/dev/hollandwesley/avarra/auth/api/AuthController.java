@@ -1,8 +1,5 @@
-package dev.hollandwesley.avarra.auth;
+package dev.hollandwesley.avarra.auth.api;
 
-import dev.hollandwesley.avarra.user.RegisterUserRequest;
-import dev.hollandwesley.avarra.user.RegisterUserResult;
-import dev.hollandwesley.avarra.user.UserRegistrationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

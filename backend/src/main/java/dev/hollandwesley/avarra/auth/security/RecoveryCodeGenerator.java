@@ -1,4 +1,4 @@
-package dev.hollandwesley.avarra.security;
+package dev.hollandwesley.avarra.auth.security;
 
 import java.security.SecureRandom;
 

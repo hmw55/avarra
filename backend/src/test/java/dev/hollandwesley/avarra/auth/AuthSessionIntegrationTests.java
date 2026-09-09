@@ -1,7 +1,8 @@
 package dev.hollandwesley.avarra.auth;
 
-import dev.hollandwesley.avarra.user.User;
-import dev.hollandwesley.avarra.user.UserRepository;
+import dev.hollandwesley.avarra.user.domain.User;
+import dev.hollandwesley.avarra.user.persistence.UserRepository;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

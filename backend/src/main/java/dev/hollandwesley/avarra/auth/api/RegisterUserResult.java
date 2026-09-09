@@ -1,4 +1,4 @@
-package dev.hollandwesley.avarra.user;
+package dev.hollandwesley.avarra.auth.api;
 
 import java.util.UUID;
 

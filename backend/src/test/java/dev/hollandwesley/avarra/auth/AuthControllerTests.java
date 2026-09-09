@@ -1,8 +1,9 @@
 package dev.hollandwesley.avarra.auth;
 
-import dev.hollandwesley.avarra.user.RegisterUserResult;
-import dev.hollandwesley.avarra.user.UserRegistrationService;
-import dev.hollandwesley.avarra.user.UsernameAlreadyExistsException;
+import dev.hollandwesley.avarra.auth.api.AuthController;
+import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
+import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
+import dev.hollandwesley.avarra.auth.application.UsernameAlreadyExistsException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

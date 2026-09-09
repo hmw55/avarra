@@ -1,4 +1,4 @@
-package dev.hollandwesley.avarra.user;
+package dev.hollandwesley.avarra.user.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

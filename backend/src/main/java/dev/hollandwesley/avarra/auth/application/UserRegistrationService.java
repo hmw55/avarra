@@ -1,6 +1,11 @@
-package dev.hollandwesley.avarra.user;
+package dev.hollandwesley.avarra.auth.application;
 
-import dev.hollandwesley.avarra.security.RecoveryCodeGenerator;
+import dev.hollandwesley.avarra.auth.api.RegisterUserRequest;
+import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
+import dev.hollandwesley.avarra.auth.security.RecoveryCodeGenerator;
+import dev.hollandwesley.avarra.user.domain.User;
+import dev.hollandwesley.avarra.user.persistence.UserRepository;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

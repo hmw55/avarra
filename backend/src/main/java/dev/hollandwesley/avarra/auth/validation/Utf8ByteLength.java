@@ -1,4 +1,4 @@
-package dev.hollandwesley.avarra.validation;
+package dev.hollandwesley.avarra.auth.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -14,10 +14,12 @@ import java.lang.annotation.Target;
         ElementType.RECORD_COMPONENT
 })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = NullOrNotBlankValidator.class)
-public @interface NullOrNotBlank {
+@Constraint(validatedBy = Utf8ByteLengthValidator.class)
+public @interface Utf8ByteLength {
 
-    String message() default "must be omitted or contain a value";
+    String message() default "must not exceed the allowed UTF-8 byte length";
+
+    int max();
 
     Class<?>[] groups() default {};
 

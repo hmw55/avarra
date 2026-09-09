@@ -1,4 +1,4 @@
-package dev.hollandwesley.avarra.auth;
+package dev.hollandwesley.avarra.auth.api;
 
 /**
  * Represents a consistent error response returned by the Avarra API.
