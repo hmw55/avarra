@@ -18,6 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 /**
  * Exposes HTTP endpoints for Avarra account authentication and registration.
@@ -29,15 +31,18 @@ public class AuthController {
     private final UserRegistrationService registrationService;
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository;
+    private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
 
     public AuthController(
-        UserRegistrationService registrationService,
-        AuthenticationManager authenticationManager,
-        SecurityContextRepository securityContextRepository
+            UserRegistrationService registrationService,
+            AuthenticationManager authenticationManager,
+            SecurityContextRepository securityContextRepository,
+            SessionAuthenticationStrategy sessionAuthenticationStrategy
     ) {
         this.registrationService = registrationService;
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
+        this.sessionAuthenticationStrategy = sessionAuthenticationStrategy;
     }
 
     @PostMapping("/register")
@@ -61,6 +66,12 @@ public class AuthController {
                 )
         );
 
+        sessionAuthenticationStrategy.onAuthentication(
+            authentication, 
+            httpRequest, 
+            httpResponse
+        );
+
         SecurityContext securityContext =
                 SecurityContextHolder.createEmptyContext();
 
@@ -72,6 +83,11 @@ public class AuthController {
                 httpResponse
         );
 
+        return new LoginResponse(authentication.getName());
+    }
+
+    @GetMapping("/me")
+    public LoginResponse currentUser(Authentication authentication) {
         return new LoginResponse(authentication.getName());
     }
 }

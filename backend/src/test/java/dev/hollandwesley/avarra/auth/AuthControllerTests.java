@@ -26,6 +26,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.web.context.SecurityContextRepository;
 
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 import static org.mockito.Mockito.verify;
 
@@ -43,6 +44,9 @@ class AuthControllerTests {
 
     @MockitoBean
     private SecurityContextRepository securityContextRepository;
+
+    @MockitoBean
+    private SessionAuthenticationStrategy sessionAuthenticationStrategy;
 
     @Test
     void registersUserAndReturnsCreated() throws Exception {
