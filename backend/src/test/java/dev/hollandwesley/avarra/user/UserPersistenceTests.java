@@ -5,9 +5,12 @@ import jakarta.persistence.EntityManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import org.checkerframework.checker.units.qual.m;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -19,6 +22,9 @@ class UserPersistenceTests {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void persistsAndLoadsUser() {
@@ -46,5 +52,40 @@ class UserPersistenceTests {
         assertEquals("recovery-code-hash", loadedUser.getRecoveryCodeHash());
         assertNotNull(loadedUser.getCreatedAt());
         assertNotNull(loadedUser.getUpdatedAt());
+    }
+
+    @Test
+    void findsUserByUsernameIgnoreCase() {
+        User user = new User(
+            UUID.randomUUID(),
+            "TestUser",
+            "password-hash",
+            null,
+            "recovery-code-hash"
+        );
+
+        userRepository.save(user);
+
+        Optional<User> foundUser = userRepository.findByUsernameIgnoreCase("testuser");
+
+        assertTrue(foundUser.isPresent());
+        assertEquals("TestUser", foundUser.get().getUsername());
+    }
+
+    @Test
+    void detectsExistingUsernameIgnoringCase() {
+        User user = new User(
+            UUID.randomUUID(),
+            "TestUser",
+            "password-hash",
+            null,
+            "recovery-code-hash"
+        );
+
+        userRepository.save(user);
+
+        boolean exists = userRepository.existsByUsernameIgnoreCase("TESTUSER");
+
+        assertTrue(exists);
     }
 }
