@@ -46,6 +46,54 @@ git clone https://github.com/hmw55/avarra.git
 cd avarra
 ```
 
+---
+
+## Local Database
+
+Avarra uses PostgreSQL for persistence. The local PostgreSQL development instance runs in Docker and is managed with Docker Compose.
+
+### Configure the Environment
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Update `.env` with local development values. In particular, replace the example database password with a local password.
+
+The `.env` file is ignored by Git and must never be committed.
+
+### Start PostgreSQL
+
+From the repository root:
+
+```bash
+docker compose up -d
+```
+
+Verify that the PostgreSQL container is running:
+
+```bash
+docker compose ps
+```
+
+To view the database logs:
+
+```bash
+docker compose logs postgres
+```
+
+To stop the local database:
+
+```bash
+docker compose down
+```
+
+The PostgreSQL data is stored in a Docker volume and persists when the container is stopped or recreated with `docker compose down`.
+
+---
+
 ### Backend
 
 The Avarra backend is a Java 21 application built with Spring Boot and Maven.
@@ -53,6 +101,10 @@ The Avarra backend is a Java 21 application built with Spring Boot and Maven.
 From the repository root: 
 
 ```bash
+set -a
+source .env
+set +a
+
 cd backend
 ./mvnw spring-boot:run
 ```
