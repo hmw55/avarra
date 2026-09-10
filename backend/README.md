@@ -104,6 +104,8 @@ Database schema changes are managed by **Flyway**.
 
 Hibernate is configured to validate the database schema rather than create or modify it automatically. This keeps schema ownership with the migration history and makes database changes explicit and reproducible.
 
+Open Session in View is disabled. Persistence work should be completed within intentional application and persistence boundaries rather than allowing database access to continue implicitly during HTTP response rendering.
+
 Migration files are immutable after they become part of the project's migration history. Changes to an existing schema should be introduced through a new migration rather than by editing a previously applied migration.
 
 The initial migration establishes the registered user account schema.
@@ -138,6 +140,7 @@ Authentication is deliberately separated from future game-character identity. A 
 |--------|----------|-------------------------|---------|
 | `POST` | `/api/auth/register` | No | Create a registered Avarra account |
 | `POST` | `/api/auth/login` | No | Authenticate credentials and establish a session |
+| `GET` | `/api/auth/csrf` | No | Return the current CSRF token for browser clients |
 | `GET` | `/api/auth/me` | Yes | Return the currently authenticated account |
 | `POST` | `/api/auth/logout` | Yes | End the authenticated session |
 
@@ -167,6 +170,8 @@ Current backend practices include:
 - Logout invalidates the authenticated server-side session.
 - Logout remains protected by CSRF.
 - Unauthenticated requests to protected API resources return `401 Unauthorized`.
+- Browser clients can retrieve the current CSRF token through `/api/auth/csrf`.
+- Local development CORS allows credentialed requests from the Vite frontend at `http://localhost:5173`.
 
 Security controls should not be removed merely to simplify deployment or testing. 
 
@@ -265,7 +270,9 @@ Current user (/me)  Complete
 Logout              Complete
 ```
 
-Before frontend authentication is connected, the backend requires a small integration-focused hardening pass covering CSRF integration, CORS configuration, and related API/session behavior.
+The backend authentication foundation is now ready for local frontend integration. CSRF-token retrieval, local credentialed CORS, logout behavior, unauthenticated API responses, and session-related security behavior are in place and covered by automated tests.
+
+The next authentication work should occur alongside the React frontend integration rather than through additional speculative backend hardening.
 
 The following authentication capabilities remain intentionally deferred:
 

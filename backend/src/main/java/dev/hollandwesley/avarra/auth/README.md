@@ -27,6 +27,7 @@ Current responsibilities include:
 - User registration
 - Username/password login
 - Retrieval of the currently authenticated user
+- CSRF-token retrieval for browser clients
 - Authentication request and response models
 - Translation of authentication and validation failures into HTTP responses
 
@@ -243,17 +244,43 @@ A successful logout:
 2. Invalidates the server-side HTTP session.
 3. Returns `204 No Content`.
 
-Logout remains protected by CSRF. Requests attempting to logout without a valid CSRF taken are rejected.
+Logout remains protected by CSRF. Requests attempting to logout without a valid CSRF token are rejected.
 
-After logout, protected API endpoints require authentication again. Unauthenticated requests to protect API resources return `401 Unauthorized`.
+After logout, protected API endpoints require authentication again. Unauthenticated requests to protected API resources return `401 Unauthorized`.
 
 ## CSRF Protection
 
-CSRF protection remains enabled.
+CSRF protection remains enabled for Avarra's session-based authentication model.
 
-Public accessibility of an endpoint does not bypass CSRF protection. For example, registration and login may be available without an authentication account while still being subject to the applicable CSRF requirements. 
+Browser clients can retrieve the current CSRF token through:
 
-CSRF protection should not be disabled merely to simplify the frontend integration. The final frontend/backend deployment model will determine the production CSRF and cookie configuration.
+```http
+GET /api/auth/csrf
+```
+
+The endpoint is publicly accessible so that the frontend can obtain a CSRF token before submitting authentication or other state-changing requests.
+
+Public accessibility does not bypass CSRF protection. Registration, login, and logout remain subject to the applicable CSRF requirements even when the user does not yet have an authenticated account.
+
+The React frontend should obtain a current CSRF token before state-changing requests and refresh the token when authentication state changes are required by Spring Security's session and CSRF behavior.
+
+CSRF protection should not be disabled merely to simplify frontend integration. Final production CSRF and cookie behavior will be configured according to the eventual frontend/backend deployment model.
+
+---
+
+## CORS
+
+The backend currently allows credential API requests from the local Vite development frontend:
+
+```text
+https://localhost:5173
+```
+
+Cors is configured for `/api/**` requests and allows the browser to include the session cookie with cross-origin request during local development.
+
+The development configuration does not use a wildcard origin because credentialed browser requests require an explicit trusted origin.
+
+Production frontend origins are intentionally not configured yet. They will be added when the deployment topology and public frontend/backend hosts are finalized.
 
 ---
 
@@ -261,12 +288,12 @@ CSRF protection should not be disabled merely to simplify the frontend integrati
 
 Authentication code should preserve the following boundaries:
 
-- Raw passwords must never be persisted of logged.
+- Raw passwords must never be persisted or logged.
 - Raw recovery codes must not be persisted.
 - Password and recovery-code hashes must never be exposed through API responses.
 - Persistence entities must not be returned directly as public API models.
 - Username uniqueness must remain case-insensitive.
-- Passwords exceeding BCrypt's support input boundary must be rejected rather than silently truncated.
+- Passwords exceeding BCrypt's supported input boundary must be rejected rather than silently truncated.
 - Authentication errors should not unnecessarily reveal credential details.
 - Session fixation protection must remain part of successful authentication.
 - CSRF protection should remain enabled for the session-based authentication model.
@@ -291,6 +318,8 @@ Current tests verify:
 - Authentication API behavior
 - Spring Security configuration
 - CSRF enforcement
+- Public CSRF-token retrieval
+- Local frontend CORS preflight behavior
 - Session persistence across requests
 - Session fixation protection
 - User persistence behavior relevant to authentication
@@ -298,7 +327,7 @@ Current tests verify:
 - Logout CSRF enforcement
 - Unauthenticated protected-resource handling.
 
-Integration test use real PostgreSQL persistence where database behavior is part of the behavior being verified.
+Integration tests use real PostgreSQL persistence where database behavior is part of the behavior being verified.
 
 ---
 
@@ -315,7 +344,9 @@ Current user (/me)  Complete
 Logout              Complete
 ```
 
-The nest authentication work is limited to the backend behavior required for frontend integration, including CSRF integration, CORS configuration, and related API/session behavior.
+The backend authentication foundation is ready for local frontend integration. CSRF-token retrieval, credentialed local CORS, session authentication, logout, and unauthenticated protected-resource behavior are implemented and tested.
+
+The next authentication work should happen through integration with the React frontend rather than through additional speculative backend features.
 
 The following capabilities remain intentionally deferred:
 
@@ -324,4 +355,4 @@ The following capabilities remain intentionally deferred:
 - Final production cookie configuration
 - Deployment-specific authentication hardening
 
-These capabilities should be introduces when their corresponding application or deployment requirements are reached rather than implemented speculatively.
+These capabilities should be introduced when their corresponding application or deployment requirements are reached rather than implemented speculatively.

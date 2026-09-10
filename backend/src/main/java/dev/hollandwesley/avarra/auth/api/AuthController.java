@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,10 +25,13 @@ import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
 
 /**
  * Exposes HTTP endpoints for Avarra registration and authentication.
- * 
+ *
  * <p>Successful login establishes server-side session authentication through
  * Spring Security. Authentication state is persisted in the HTTP session rather
  * than returned to the client as a bearer token.
+ *
+ * <p>The controller also exposes the current CSRF token so browser clients can
+ * submit CSRF-protected state-changing requests.
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -108,5 +112,10 @@ public class AuthController {
     @GetMapping("/me")
     public LoginResponse currentUser(Authentication authentication) {
         return new LoginResponse(authentication.getName());
+    }
+
+    @GetMapping("/csrf")
+    public CsrfToken csrf(CsrfToken csrfToken) {
+        return csrfToken;
     }
 }

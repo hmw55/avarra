@@ -1,5 +1,9 @@
 package dev.hollandwesley.avarra.auth.security;
 
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,18 +13,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 /**
  * Configures authentication and HTTP security for the Avarra backend.
- * 
+ *
  * <p>Registered users authenticate through server-side HTTP sessions.
- * Registration and login are publicly accessible, while all other endpoints
- * require authentication unless explicitly permitted here.
- * 
+ * Registration, login, and CSRF-token retrieval are publicly accessible,
+ * while all other endpoints require authentication unless explicitly
+ * permitted here.
+ *
  * <p>CSRF protection remains enabled through Spring Security's default
  * configuration.
  */
@@ -32,18 +38,29 @@ public class SecurityConfig {
             throws Exception {
 
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                            "/api/auth/register",
-                            "/api/auth/login"
+                                "/api/auth/register",
+                                "/api/auth/login",
+                                "/api/auth/csrf"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, exception) ->
+                                response.sendError(
+                                        HttpServletResponse.SC_UNAUTHORIZED
+                                )
+                        )
+                )
                 .logout(logout -> logout
-                    .logoutUrl("/api/auth/logout")
-                    .logoutSuccessHandler((request, response, authentication) ->
-                        response.setStatus(HttpServletResponse.SC_NO_CONTENT)
-                    )
+                        .logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) ->
+                                response.setStatus(
+                                        HttpServletResponse.SC_NO_CONTENT
+                                )
+                        )
                 );
 
         return http.build();
@@ -51,7 +68,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration authenticationConfiguration
+            AuthenticationConfiguration authenticationConfiguration
     ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
@@ -74,5 +91,28 @@ public class SecurityConfig {
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new ChangeSessionIdAuthenticationStrategy();
+    }
+
+    /**
+     * Allows the local Avarra frontend to make credentialed API requests during
+     * development.
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedMethods(
+            List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+        );
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/api/**", configuration);
+
+        return source;
     }
 }
