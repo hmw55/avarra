@@ -11,7 +11,7 @@
       rgba(8, 9, 8, 0.72),
       rgba(8, 9, 8, 0.78)
     ),
-    url('../../assets/backgrounds/dunvael-entry.png') center / cover no-repeat fixed;
+    url('../../assets/backgrounds/dunvael-entry.webp') center / cover no-repeat fixed;
 }
 
 /* ---------- Header ---------- */
