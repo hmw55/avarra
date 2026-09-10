@@ -1,61 +1,57 @@
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import EntryLayout from '../components/layout/EntryLayout'
 import { useAuth } from '../auth/useAuth'
 
 function EnterPage() {
   const navigate = useNavigate()
   const { continueAsGuest } = useAuth()
 
+  // Intentional console easter agg for curious travelers.
+  useEffect(() => {
+    console.info(
+      '%cYou found the hidden path. The world remembers curious travelers.',
+      'color: #c8ba96; font-weight: bold;'
+    )
+  }, [])
+
   function handleContinueAsGuest() {
     continueAsGuest()
-    navigate('/play')
+    navigate('/journeys')
   }
 
   return (
-    <div className="app">
-      <header className="site-header">
-        <Link to="/" className="site-title">
-          AVARRA
+    <EntryLayout
+      eyebrow="Enter the world"
+      title="Enter Avarra"
+      description="Choose how you would like to continue."
+      backTo="/"
+      backLabel="Back to Home"
+    >
+      <div className="entry-actions">
+        <Link
+          to="/login"
+          className="entry-primary-action"
+        >
+          Log In
         </Link>
-      </header>
 
-      <main className="home">
-        <section className="intro-panel" aria-labelledby="entry-title">
-          <p className="eyebrow">Enter the world</p>
+        <Link
+          to="/register"
+          className="entry-secondary-action"
+        >
+          Create Account
+        </Link>
 
-          <h1 id="entry-title">Enter Avarra</h1>
-
-          <p className="description">
-            Choose how you would like to continue.
-          </p>
-
-          <div className="entry-actions">
-            <Link to="/login" className="primary-action">
-              Log In
-            </Link>
-
-            <Link to="/register" className="secondary-action">
-              Create Account
-            </Link>
-
-            <button
-              type="button"
-              className="secondary-action"
-              onClick={handleContinueAsGuest}
-            >
-              Continue as Guest
-            </button>
-          </div>
-
-          <Link to="/" className="back-link">
-            Back
-          </Link>
-        </section>
-      </main>
-
-      <footer className="site-footer">
-        <span>Avarra</span>
-      </footer>
-    </div>
+        <button
+          type="button"
+          className="entry-secondary-action"
+          onClick={handleContinueAsGuest}
+        >
+          Continue as Guest
+        </button>
+      </div>
+    </EntryLayout>
   )
 }
 

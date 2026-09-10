@@ -1,65 +1,74 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { logout } from '../auth/authApi'
-import { useAuth } from '../auth/useAuth'
+import { useEffect } from 'react'
+import EntryLayout from '../components/layout/EntryLayout'
 
+/**
+ * TODO: Replace the temporary journey actions with save-aware entry states.
+ *
+ * Future behavior:
+ * - Hide "Continue Game" when no save exists.
+ * - Registered users may create and manage multiple saves.
+ * - Guest users may only have one active save:
+ *   - Hide "Start New Game" once a guest save exists.
+ *   - Guests cannot create an additional save.
+ *   - Guests cannot delete/reset their save through the application;
+ *     clearing local browser data will remain the manual reset path unless
+ *     guest save management is intentionally added later.
+ * - Use authentication state to explain guest save limitations before a
+ *   guest begins their first journey.
+ */
+
+/**
+ * Presents the journey entry point before character preparation and gameplay.
+ *
+ * Save-aware controls will eventually differ between registered and guest
+ * players. This page remains part of the shared pre-game interface.
+ */
 function GameEntryPage() {
-  const { user, setUser } = useAuth()
-  const navigate = useNavigate()
-
-  async function handleLogout() {
-    try {
-      await logout()
-      setUser(null)
-      navigate('/enter')
-    } catch {
-      // Proper logout error handling will be added with the UI pass.
-    }
-  }
+  // Intentional console easter egg for travelers approaching their journey.
+  useEffect(() => {
+    console.info(
+      '%cYou made it this far. Surely nothing life-altering could happen next.',
+      'color: #c8ba96; font-weight: bold;',
+    )
+  }, [])
 
   return (
-    <div className="app">
-      <header className="site-header">
-        <Link to="/" className="site-title">
-          AVARRA
-        </Link>
+    <EntryLayout
+      eyebrow="Your journey"
+      title="Avarra Awaits"
+      description="Choose how you would like to continue."
+    >
+      <div className="entry-info-box">
+        <strong>You do not need to study Avarra before you begin.</strong>
 
-        {user && (
-          <button type="button" onClick={handleLogout}>
-            Log Out
-          </button>
-        )}
-      </header>
+        <p>
+          Starting a new journey will take you to a preparation screen where
+          you can explore the lore, history, peoples, and foundations of
+          Avarra before choosing your character.
+        </p>
 
-      <main className="home">
-        <section className="intro-panel" aria-labelledby="game-entry-title">
-          <p className="eyebrow">Your journey</p>
+        <p>
+          You can read as much or as little as you want before continuing.
+          You'll have the ability to read during gameplay as well.
+        </p>
+      </div>
 
-          <h1 id="game-entry-title">Avarra Awaits</h1>
+      <div className="entry-actions">
+        <button
+          type="button"
+          className="entry-primary-action"
+        >
+          Start New Game
+        </button>
 
-          <p className="description">
-            Choose how you would like to continue.
-          </p>
-
-          <div className="entry-actions">
-            <button type="button" className="primary-action">
-              Start New Game
-            </button>
-
-            <button type="button" className="secondary-action">
-              Continue Game
-            </button>
-          </div>
-
-          <Link to="/enter" className="back-link">
-            Back
-          </Link>
-        </section>
-      </main>
-
-      <footer className="site-footer">
-        <span>Avarra</span>
-      </footer>
-    </div>
+        <button
+          type="button"
+          className="entry-secondary-action"
+        >
+          Continue Game
+        </button>
+      </div>
+    </EntryLayout>
   )
 }
 

@@ -4,6 +4,8 @@ import EnterPage from './pages/EnterPage'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import GameEntryPage from './pages/GameEntryPage'
+import AboutPage from './pages/AboutPage'
+import LorePage from './pages/LorePage'
 import './App.css'
 
 function App() {
@@ -13,7 +15,9 @@ function App() {
       <Route path="/enter" element={<EnterPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/play" element={<GameEntryPage />} />
+      <Route path="/journeys" element={<GameEntryPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/lore" element={<LorePage />} />
     </Routes>
   )
 }
