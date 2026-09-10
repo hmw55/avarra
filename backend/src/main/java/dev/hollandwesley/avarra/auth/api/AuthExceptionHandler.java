@@ -1,17 +1,20 @@
 package dev.hollandwesley.avarra.auth.api;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import dev.hollandwesley.avarra.auth.application.UsernameAlreadyExistsException;
 
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.security.core.AuthenticationException;
-
 /**
- * Translates authentication and registration exceptions into HTTP responses.
+ * Translates authentication, registration, and request-validation failures
+ * into consistent HTTP API error responses.
+ * 
+ * <p>This advice keeps HTTP-specific error handling at the authentication API
+ * boundary rather than coupling application or security code to HTTP responses.
  */
 @RestControllerAdvice
 public class AuthExceptionHandler {
@@ -36,7 +39,7 @@ public class AuthExceptionHandler {
         return new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                "Registration request is invalid"
+                "Request is invalid"
         );
     }
 

@@ -1,10 +1,10 @@
-package dev.hollandwesley.avarra.auth;
+package dev.hollandwesley.avarra.auth.security;
 
-import dev.hollandwesley.avarra.user.domain.User;
-import dev.hollandwesley.avarra.user.persistence.UserRepository;
+import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -13,7 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.UUID;
+import dev.hollandwesley.avarra.user.domain.User;
+import dev.hollandwesley.avarra.user.persistence.UserRepository;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,6 +22,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Verifies Avarra's server-side authentication session behavior using the
+ * full Spring application context.
+ * 
+ * <p>These integration tests confirm that successful login persists
+ * authentication across requests and that Spring Security's session fixation
+ * protection changes an existing session identifier during authentication.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthSessionIntegrationTests {
@@ -108,6 +117,8 @@ class AuthSessionIntegrationTests {
         MockHttpSession authenticatedSession =
                 (MockHttpSession) loginResult.getRequest().getSession(false);
 
+        // Successful authentication must rotate the existing session ID to protect
+        // against session fixation while preserving the authenticated session.
         org.junit.jupiter.api.Assertions.assertNotEquals(
                 originalSessionId,
                 authenticatedSession.getId()

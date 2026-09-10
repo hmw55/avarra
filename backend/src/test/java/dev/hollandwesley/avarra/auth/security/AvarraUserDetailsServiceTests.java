@@ -1,21 +1,26 @@
-package dev.hollandwesley.avarra.security;
+package dev.hollandwesley.avarra.auth.security;
 
-import dev.hollandwesley.avarra.auth.security.AvarraUserDetailsService;
-import dev.hollandwesley.avarra.user.domain.User;
-import dev.hollandwesley.avarra.user.persistence.UserRepository;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.Optional;
-import java.util.UUID;
+import dev.hollandwesley.avarra.user.domain.User;
+import dev.hollandwesley.avarra.user.persistence.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Verifies the Spring Security user-details adapter for registered Avarra users.
+ * 
+ * <p>These tests confirm case-insensitive account lookup, preservation of the 
+ * user's canonical username, and rejection of unknown usernames.
+ */
 class AvarraUserDetailsServiceTests {
 
     @Test

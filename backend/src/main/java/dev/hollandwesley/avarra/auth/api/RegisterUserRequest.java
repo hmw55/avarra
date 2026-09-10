@@ -1,11 +1,12 @@
 package dev.hollandwesley.avarra.auth.api;
 
-import dev.hollandwesley.avarra.auth.validation.NullOrNotBlank;
-import dev.hollandwesley.avarra.auth.validation.Utf8ByteLength;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import dev.hollandwesley.avarra.auth.validation.NullOrNotBlank;
+import dev.hollandwesley.avarra.auth.validation.Utf8ByteLength;
 
 /**
  * Contains the account information required to register a new Avarra user.

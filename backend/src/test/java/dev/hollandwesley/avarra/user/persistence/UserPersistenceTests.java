@@ -1,14 +1,9 @@
-package dev.hollandwesley.avarra.user;
-
-import jakarta.persistence.EntityManager;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+package dev.hollandwesley.avarra.user.persistence;
 
 import java.util.Optional;
 import java.util.UUID;
+
+import jakarta.persistence.EntityManager;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +11,20 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 import dev.hollandwesley.avarra.user.domain.User;
-import dev.hollandwesley.avarra.user.persistence.UserRepository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Verifies persistence behavior for Avarra user accounts against the configured
+ * PostgreSQL database.
+ * 
+ * <p>These tests exercise the JPA mapping, generated timestamps, and
+ * case-insensitive repository queries using the same database type used by
+ * Avarra rather than an embedded test database.
+ */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserPersistenceTests {

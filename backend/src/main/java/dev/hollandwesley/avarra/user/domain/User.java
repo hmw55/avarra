@@ -1,15 +1,14 @@
 package dev.hollandwesley.avarra.user.domain;
 
+import java.time.Instant;
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-
-import java.time.Instant;
-import java.util.UUID;
-
 /**
  * Represents a registered Avarra user account.
  *
@@ -45,6 +44,12 @@ public class User {
         // Required by JPA.
     }
 
+    /**
+     * Creates a registered user from already-processed account data.
+     * 
+     * <p>Password and recovery-code values supplied here must already be hashed;
+     * raw credentials must not be stored in the user entity.
+     */
     public User(
         UUID id,
         String username,

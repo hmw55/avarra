@@ -1,8 +1,6 @@
-package dev.hollandwesley.avarra.security;
+package dev.hollandwesley.avarra.auth.security;
 
 import org.junit.jupiter.api.Test;
-
-import dev.hollandwesley.avarra.auth.security.RecoveryCodeGenerator;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

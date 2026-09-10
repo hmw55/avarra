@@ -1,12 +1,12 @@
 package dev.hollandwesley.avarra.auth.security;
 
-import dev.hollandwesley.avarra.user.domain.User;
-import dev.hollandwesley.avarra.user.persistence.UserRepository;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import dev.hollandwesley.avarra.user.domain.User;
+import dev.hollandwesley.avarra.user.persistence.UserRepository;
 
 /**
  * Loads Avarra user accounts for Spring Security authentication.

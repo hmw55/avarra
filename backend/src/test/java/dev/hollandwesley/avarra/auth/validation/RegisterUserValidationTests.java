@@ -1,7 +1,8 @@
-package dev.hollandwesley.avarra.user;
+package dev.hollandwesley.avarra.auth.validation;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+
 import org.junit.jupiter.api.Test;
 
 import dev.hollandwesley.avarra.auth.api.RegisterUserRequest;
@@ -9,6 +10,12 @@ import dev.hollandwesley.avarra.auth.api.RegisterUserRequest;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Verifies validation rules for Avarra user registration requests.
+ * 
+ * <p>These tests cover username and email constraints and confirm that
+ * passwords are limited by UTF-8 byte length rather than Java character count.
+ */
 class RegisterUserRequestValidationTests {
 
     private final Validator validator =
@@ -90,8 +97,8 @@ class RegisterUserRequestValidationTests {
 
         assertTrue(validator.validate(request).isEmpty());
     }
-    @Test
 
+    @Test
     void rejectsInvalidEmail() {
         RegisterUserRequest request = new RegisterUserRequest(
                 "ValidUser",

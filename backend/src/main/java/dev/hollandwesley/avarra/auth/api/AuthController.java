@@ -1,7 +1,18 @@
 package dev.hollandwesley.avarra.auth.api;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,19 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 /**
- * Exposes HTTP endpoints for Avarra account authentication and registration.
+ * Exposes HTTP endpoints for Avarra registration and authentication.
+ * 
+ * <p>Successful login establishes server-side session authentication through
+ * Spring Security. Authentication state is persisted in the HTTP session rather
+ * than returned to the client as a bearer token.
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -53,6 +58,18 @@ public class AuthController {
         return registrationService.register(request);
     }
     
+    /**
+     * Authenticates a registered user and establishes an authenticated HTTP session.
+     * 
+     * <p>The session authentication strategy is applied before the authenticated
+     * security context is persisted so that Spring Security's session fixation
+     * protection is honored for the new login.
+     * 
+     * @param request submitted username and password
+     * @param httpRequest current HTTP request used to establish the session
+     * @param httpResponse current HTTP response associated with the session
+     * @return the authenticated user's canonical username
+     */
     @PostMapping("/login")
     public LoginResponse login(
             @Valid @RequestBody LoginRequest request,
@@ -72,6 +89,8 @@ public class AuthController {
             httpResponse
         );
 
+        // Persist authentication explicitly because this JSON login endpoint does not
+        // use Spring Security's form-login filter to establish the security context.
         SecurityContext securityContext =
                 SecurityContextHolder.createEmptyContext();
 

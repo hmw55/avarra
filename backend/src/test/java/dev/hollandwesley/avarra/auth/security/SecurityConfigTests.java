@@ -1,16 +1,17 @@
-package dev.hollandwesley.avarra.security;
+package dev.hollandwesley.avarra.auth.security;
 
-import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
-import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.UUID;
+import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
+import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Verifies the HTTP access rules configured for Avarra authentication
+ * 
+ * <p>These tests confirm that registration is publicly accessible while
+ * remaining protected by Spring Security's CSRF defenses.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class SecurityConfigTests {

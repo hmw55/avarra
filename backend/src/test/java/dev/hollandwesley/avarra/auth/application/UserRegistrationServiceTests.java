@@ -1,17 +1,16 @@
-package dev.hollandwesley.avarra.user;
-
-import dev.hollandwesley.avarra.auth.api.RegisterUserRequest;
-import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
-import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
-import dev.hollandwesley.avarra.auth.application.UsernameAlreadyExistsException;
-import dev.hollandwesley.avarra.auth.security.RecoveryCodeGenerator;
-import dev.hollandwesley.avarra.user.domain.User;
-import dev.hollandwesley.avarra.user.persistence.UserRepository;
+package dev.hollandwesley.avarra.auth.application;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import dev.hollandwesley.avarra.auth.api.RegisterUserRequest;
+import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
+import dev.hollandwesley.avarra.auth.security.RecoveryCodeGenerator;
+import dev.hollandwesley.avarra.user.domain.User;
+import dev.hollandwesley.avarra.user.persistence.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -22,6 +21,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Verifies Avarra's registered-user creation workflow.
+ * 
+ * <p>These tests cover case-insensitive username conflicts and confirm that
+ * persisted credentials are hashed while the raw recovery code is returned
+ * only in the registration result.
+ */
 class UserRegistrationServiceTests {
 
     @Test
@@ -77,6 +83,8 @@ class UserRegistrationServiceTests {
 
         RegisterUserResult result = registrationService.register(request);
 
+        // Inspect the entity passed to persistence so the text can verify that
+        // raw credentials never cross the persistence boundary.
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
 

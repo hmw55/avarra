@@ -1,36 +1,38 @@
-package dev.hollandwesley.avarra.auth;
-
-import dev.hollandwesley.avarra.auth.api.AuthController;
-import dev.hollandwesley.avarra.auth.api.RegisterUserResult;
-import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
-import dev.hollandwesley.avarra.auth.application.UsernameAlreadyExistsException;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+package dev.hollandwesley.avarra.auth.api;
 
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import dev.hollandwesley.avarra.auth.application.UserRegistrationService;
+import dev.hollandwesley.avarra.auth.application.UsernameAlreadyExistsException;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.web.context.SecurityContextRepository;
-
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-
-import static org.mockito.Mockito.verify;
-
+/**
+ * verifies the HTTP contract of Avarra's authentication endpoints.
+ * 
+ * <p>These tests exercise request validation, response status, and payloads,
+ * exception translation, and controller interactions while mocking
+ * authentication and application-layer dependencies.
+ */
 @WebMvcTest(AuthController.class)
 class AuthControllerTests {
 
@@ -91,7 +93,7 @@ class AuthControllerTests {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message")
-                        .value("Registration request is invalid"));
+                        .value("Request is invalid"));
     }
 
     @Test
@@ -137,6 +139,14 @@ class AuthControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("Mack_98"));
 
+        verify(sessionAuthenticationStrategy).onAuthentication(
+                any(Authentication.class), 
+                any(), 
+                any()
+        );
+
+        // JSON login must explicitly persist the authenticated security context
+        // because Avarra does not use Sprint Security's form-login filter.
         verify(securityContextRepository).saveContext(
             any(SecurityContext.class), 
             any(), 
