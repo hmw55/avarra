@@ -1,6 +1,15 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../auth/useAuth'
 
 function EnterPage() {
+  const navigate = useNavigate()
+  const { continueAsGuest } = useAuth()
+
+  function handleContinueAsGuest() {
+    continueAsGuest()
+    navigate('/play')
+  }
+
   return (
     <div className="app">
       <header className="site-header">
@@ -20,15 +29,19 @@ function EnterPage() {
           </p>
 
           <div className="entry-actions">
-            <button type="button" className="primary-action">
+            <Link to="/login" className="primary-action">
               Log In
-            </button>
+            </Link>
 
-            <button type="button" className="secondary-action">
+            <Link to="/register" className="secondary-action">
               Create Account
-            </button>
+            </Link>
 
-            <button type="button" className="secondary-action">
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={handleContinueAsGuest}
+            >
               Continue as Guest
             </button>
           </div>
