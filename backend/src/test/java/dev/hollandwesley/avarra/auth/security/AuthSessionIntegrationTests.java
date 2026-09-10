@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import dev.hollandwesley.avarra.user.domain.User;
 import dev.hollandwesley.avarra.user.persistence.UserRepository;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,10 +26,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Verifies Avarra's server-side authentication session behavior using the
  * full Spring application context.
- * 
+ *
  * <p>These integration tests confirm that successful login persists
- * authentication across requests and that Spring Security's session fixation
- * protection changes an existing session identifier during authentication.
+ * authentication across requests, that session fixation protection changes
+ * an existing session identifier during authentication, and that logout
+ * invalidates authenticated sessions while remaining protected by CSRF.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -107,8 +109,8 @@ class AuthSessionIntegrationTests {
                         .contentType("application/json")
                         .content("""
                                 {
-                                "username": "SessionTestUser",
-                                "password": "AvarraTestPassword123!"
+                                  "username": "SessionTestUser",
+                                  "password": "AvarraTestPassword123!"
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -119,7 +121,7 @@ class AuthSessionIntegrationTests {
 
         // Successful authentication must rotate the existing session ID to protect
         // against session fixation while preserving the authenticated session.
-        org.junit.jupiter.api.Assertions.assertNotEquals(
+        assertNotEquals(
                 originalSessionId,
                 authenticatedSession.getId()
         );
@@ -128,5 +130,75 @@ class AuthSessionIntegrationTests {
                         .session(authenticatedSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value(USERNAME));
+    }
+
+    @Test
+    void logoutInvalidatesAuthenticatedSession() throws Exception {
+        User user = new User(
+                UUID.randomUUID(),
+                USERNAME,
+                passwordEncoder.encode(PASSWORD),
+                null,
+                passwordEncoder.encode("AVARRA-TEST-RECOVERY-CODE")
+        );
+
+        userRepository.save(user);
+
+        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "username": "SessionTestUser",
+                                  "password": "AvarraTestPassword123!"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        MockHttpSession session =
+                (MockHttpSession) loginResult.getRequest().getSession(false);
+
+        mockMvc.perform(post("/api/auth/logout")
+                        .session(session)
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
+
+        org.junit.jupiter.api.Assertions.assertTrue(session.isInvalid());
+
+        mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void logoutRejectsRequestWithoutCsrfToken() throws Exception {
+        User user = new User(
+                UUID.randomUUID(),
+                USERNAME,
+                passwordEncoder.encode(PASSWORD),
+                null,
+                passwordEncoder.encode("AVARRA-TEST-RECOVERY-CODE")
+        );
+
+        userRepository.save(user);
+
+        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "username": "SessionTestUser",
+                                  "password": "AvarraTestPassword123!"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        MockHttpSession session =
+                (MockHttpSession) loginResult.getRequest().getSession(false);
+
+        mockMvc.perform(post("/api/auth/logout")
+                        .session(session))
+                .andExpect(status().isForbidden());
     }
 }

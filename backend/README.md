@@ -125,6 +125,8 @@ The current authentication flow supports:
 - Session fixation protection
 - Retrieval of the currently authenticated user
 - CSRF protection
+- Session logout and invalidation
+- API-style `401 Unauthorized` responses for unauthenticated protected requests
 
 Authentication is deliberately separated from future game-character identity. A registered account represents a user of Avarra; characters and game state are separate domain concepts.
 
@@ -137,8 +139,9 @@ Authentication is deliberately separated from future game-character identity. A 
 | `POST` | `/api/auth/register` | No | Create a registered Avarra account |
 | `POST` | `/api/auth/login` | No | Authenticate credentials and establish a session |
 | `GET` | `/api/auth/me` | Yes | Return the currently authenticated account |
+| `POST` | `/api/auth/logout` | Yes | End the authenticated session |
 
-Logout, account recovery, persistent login, and production deployment hardening are planned but are not part of the current implementation.
+Account recovery, persistent login, and final production deployment hardening are planned but are not part of the current implementation.
 
 More detailed authentication documentation is maintained with the authentication package.
 
@@ -161,6 +164,9 @@ Current backend practices include:
 - CSRF protection remains enabled for session-authenticated requests.
 - Successful login applies session fixation protection as part of establishing the authenticated session.
 - Secrets and environment-specific credentials stay outside version control.
+- Logout invalidates the authenticated server-side session.
+- Logout remains protected by CSRF.
+- Unauthenticated requests to protected API resources return `401 Unauthorized`.
 
 Security controls should not be removed merely to simplify deployment or testing. 
 
@@ -214,6 +220,9 @@ The test suite currently covers multiple layers of the application, including:
 - User loading for authentication
 - Real session persistence across HTTP requests
 - Session fixation protection
+- Session logout and invalidation
+- Logout CSRF enforcement
+- Unauthenticated protected-resource behavior
 
 Integration tests use the local PostgreSQL development database where real persistence behavior is important.
 
@@ -243,25 +252,26 @@ Important classes, public APIs, security behavior, and non-obvious architecture 
 
 ## Current Development Boundary
 
-The current backend milestone is focused on establishing the account and authentication foundation before game-domain development begins.
+The registered-user authentication foundation is now complete through logout.
 
 Current authentication progress:
 
 ```text
-Registration        Complete 
-Login               Complete 
-Session persistence Complete 
-Session security    Complete 
-Current user (/me)  Complete 
-Logout              Next
+Registration        Complete
+Login               Complete
+Session persistence Complete
+Session security    Complete
+Current user (/me)  Complete
+Logout              Complete
 ```
 
-After logout is implemented, development can proceed into frontend authentication. 
+Before frontend authentication is connected, the backend requires a small integration-focused hardening pass covering CSRF integration, CORS configuration, and related API/session behavior.
 
-The following authentication capabilities are intentionally deferred:
+The following authentication capabilities remain intentionally deferred:
 
 - Account recovery flow
 - Persistent or remember-me login
-- Production cookie, CORS, CSRF, and deployment hardening
+- Final production cookie configuration
+- Deployment-specific authentication hardening
 
 These features should be implemented when their corresponding application or deployment requirements are reached rather than speculatively.

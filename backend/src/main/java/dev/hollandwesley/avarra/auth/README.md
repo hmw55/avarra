@@ -61,6 +61,8 @@ Current responsibilities include:
 - Server-side security-context persistence
 - Session fixation protection
 - Recovery-code generation
+- Session logout and invalidation
+- API authentication failure handling
 
 ### `validation`
 
@@ -133,7 +135,7 @@ Usernames:
 - Preserve the capitalization supplied by the user
 - Are unique case-insensitively
 
-Case-insensitive uniqueness is enforces both by application behavior and by database unique index on the lowercase username.
+Case-insensitive uniqueness is enforced both by application behavior and by database unique index on the lowercase username.
 
 ### Password
 
@@ -225,6 +227,26 @@ It provides the frontend with a server-authoritative way to determine which regi
 
 --- 
 
+## Logout
+
+Authenticated sessions are terminated through:
+
+```http
+POST /api/auth/logout
+```
+
+Logout is handled by Spring Security rather than by application controller logic.
+
+A successful logout:
+
+1. Clears the authenticated security context.
+2. Invalidates the server-side HTTP session.
+3. Returns `204 No Content`.
+
+Logout remains protected by CSRF. Requests attempting to logout without a valid CSRF taken are rejected.
+
+After logout, protected API endpoints require authentication again. Unauthenticated requests to protect API resources return `401 Unauthorized`.
+
 ## CSRF Protection
 
 CSRF protection remains enabled.
@@ -239,8 +261,8 @@ CSRF protection should not be disabled merely to simplify the frontend integrati
 
 Authentication code should preserve the following boundaries:
 
-- Raw passwords much never be persisted of logged.
-- Raw recover codes must not be persisted.
+- Raw passwords must never be persisted of logged.
+- Raw recovery codes must not be persisted.
 - Password and recovery-code hashes must never be exposed through API responses.
 - Persistence entities must not be returned directly as public API models.
 - Username uniqueness must remain case-insensitive.
@@ -249,6 +271,9 @@ Authentication code should preserve the following boundaries:
 - Session fixation protection must remain part of successful authentication.
 - CSRF protection should remain enabled for the session-based authentication model.
 - Secrets and environment-specific credentials must remain outside source control.
+- Logout must invalidate the authenticated server-side session.
+- Logout must remain protected by CSRF.
+- Unauthenticated access to protected API resources should return `401 Unauthorized`.
 
 ---
 
@@ -269,6 +294,9 @@ Current tests verify:
 - Session persistence across requests
 - Session fixation protection
 - User persistence behavior relevant to authentication
+- Logout session invalidation
+- Logout CSRF enforcement
+- Unauthenticated protected-resource handling.
 
 Integration test use real PostgreSQL persistence where database behavior is part of the behavior being verified.
 
@@ -284,17 +312,16 @@ Login               Complete
 Session persistence Complete
 Session security    Complete
 Current user (/me)  Complete
-Logout              Next
+Logout              Complete
 ```
 
-Logout is the next backend authentication capability to implement. 
+The nest authentication work is limited to the backend behavior required for frontend integration, including CSRF integration, CORS configuration, and related API/session behavior.
 
-The following capabilities are intentionally deferred:
+The following capabilities remain intentionally deferred:
 
 - Account recovery
 - Persistent or remember-me login
-- Production cookie configuration
-- Production CORS and CSRF integration
-- Deployment-specific authentication hardening.
+- Final production cookie configuration
+- Deployment-specific authentication hardening
 
-These capabilities should be introduced when their corresponding application or deployment requirements are reached rather than implemented speculatively.
+These capabilities should be introduces when their corresponding application or deployment requirements are reached rather than implemented speculatively.

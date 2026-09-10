@@ -1,5 +1,7 @@
 package dev.hollandwesley.avarra.auth.security;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,15 +14,13 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 /**
  * Configures authentication and HTTP security for the Avarra backend.
- * 
+ *
  * <p>Registered users authenticate through server-side HTTP sessions.
  * Registration and login are publicly accessible, while all other endpoints
  * require authentication unless explicitly permitted here.
- * 
+ *
  * <p>CSRF protection remains enabled through Spring Security's default
  * configuration.
  */
@@ -34,16 +34,25 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                            "/api/auth/register",
-                            "/api/auth/login"
+                                "/api/auth/register",
+                                "/api/auth/login"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, exception) ->
+                                response.sendError(
+                                        HttpServletResponse.SC_UNAUTHORIZED
+                                )
+                        )
+                )
                 .logout(logout -> logout
-                    .logoutUrl("/api/auth/logout")
-                    .logoutSuccessHandler((request, response, authentication) ->
-                        response.setStatus(HttpServletResponse.SC_NO_CONTENT)
-                    )
+                        .logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) ->
+                                response.setStatus(
+                                        HttpServletResponse.SC_NO_CONTENT
+                                )
+                        )
                 );
 
         return http.build();
@@ -51,7 +60,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration authenticationConfiguration
+            AuthenticationConfiguration authenticationConfiguration
     ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
