@@ -1,46 +1,41 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import EntryLayout from '../components/layout/EntryLayout'
 
+/**
+ * Landing page for Avarra.
+ *
+ * Introduces the game's core premise and provides the primary entry point
+ * into the pre-game experience.
+ */
 function HomePage() {
+  // Intentional console easter egg for curious travelers.
+  useEffect(() => {
+    console.info(
+      '%cYou are one step closer to the Source. Please do not lick the mana.',
+      'color: #c8ba96; font-weight: bold;',
+    )
+  }, [])
+
   return (
-    <div className="app">
-      <header className="site-header">
-        <span className="site-title">AVARRA</span>
-      </header>
+    <EntryLayout
+      eyebrow="A persistent fantasy tabletop RPG"
+      title="AVARRA"
+      description="Avarra is a persistent single-player fantasy tabletop RPG shaped by the choices you make and the paths you leave behind."
+    >
+      <p className="entry-tagline">
+        The world remembers.
+      </p>
 
-      <main className="home">
-        <section className="intro-panel" aria-labelledby="avarra-title">
-          <p className="eyebrow">A persistent fantasy tabletop RPG</p>
-
-          <h1 id="avarra-title">AVARRA</h1>
-
-          <p className="tagline">The world remembers.</p>
-
-          <p className="description">
-            Avarra is a persistent single-player fantasy tabletop RPG shaped
-            by the choices you make and the paths you leave behind.
-          </p>
-
-          <div className="entry-actions">
-            <Link to="/enter" className="primary-action">
-              Enter Avarra
-            </Link>
-
-            <a
-              className="github-link"
-              href="YOUR_REPO_URL"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View on GitHub
-            </a>
-          </div>
-        </section>
-      </main>
-
-      <footer className="site-footer">
-        <span>Avarra</span>
-      </footer>
-    </div>
+      <div className="entry-actions">
+        <Link
+          to="/enter"
+          className="entry-primary-action"
+        >
+          Enter Avarra
+        </Link>
+      </div>
+    </EntryLayout>
   )
 }
 

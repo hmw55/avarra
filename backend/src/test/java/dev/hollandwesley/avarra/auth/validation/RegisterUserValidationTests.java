@@ -1,0 +1,122 @@
+package dev.hollandwesley.avarra.auth.validation;
+
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
+import org.junit.jupiter.api.Test;
+
+import dev.hollandwesley.avarra.auth.api.RegisterUserRequest;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Verifies validation rules for Avarra user registration requests.
+ * 
+ * <p>These tests cover username and email constraints and confirm that
+ * passwords are limited by UTF-8 byte length rather than Java character count.
+ */
+class RegisterUserRequestValidationTests {
+
+    private final Validator validator =
+            Validation.buildDefaultValidatorFactory().getValidator();
+
+    @Test
+    void acceptsValidUsername() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "Mack_98",
+                "AvarraTestPassword123!",
+                null
+        );
+
+        assertTrue(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void rejectsUsernameThatIsTooShort() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "ab",
+                "AvarraTestPassword123!",
+                null
+        );
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void rejectsUsernameWithInvalidCharacters() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "Mack-Wesley",
+                "AvarraTestPassword123!",
+                null
+        );
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void acceptsPasswordAtSeventyTwoUtf8Bytes() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "ValidUser",
+                "a".repeat(72),
+                null
+        );
+
+        assertTrue(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void rejectsPasswordOverSeventyTwoUtf8Bytes() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "ValidUser",
+                "a".repeat(73),
+                null
+        );
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void rejectsPasswordUnderSeventyTwoCharactersButOverSeventyTwoUtf8Bytes() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "ValidUser",
+                "é".repeat(37),
+                null
+        );
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void acceptsValidEmail() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "ValidUser",
+                "AvarraTestPassword123!",
+                "player@example.com"
+        );
+
+        assertTrue(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void rejectsInvalidEmail() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "ValidUser",
+                "AvarraTestPassword123!",
+                "not-an-email"
+        );
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void rejectsBlankEmail() {
+        RegisterUserRequest request = new RegisterUserRequest(
+                "ValidUser",
+                "AvarraTestPassword123!",
+                "   "
+        );
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
+}
