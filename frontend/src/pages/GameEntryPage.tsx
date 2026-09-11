@@ -1,5 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import EntryLayout from '../components/layout/EntryLayout'
+import { getJourneys } from '../journey/journeyApi'
+import type { JourneySummary } from '../journey/journeyApi'
+import { useAuth } from '../auth/useAuth'
+import { hasGuestJourney } from '../journey/guestJourneyStorage'
 
 /**
  * TODO: Replace the temporary journey actions with save-aware entry states.
@@ -24,6 +28,11 @@ import EntryLayout from '../components/layout/EntryLayout'
  * players. This page remains part of the shared pre-game interface.
  */
 function GameEntryPage() {
+
+  const { user, isGuest, isLoading } = useAuth()
+  const [journeys, setJourneys] = useState<JourneySummary[]>([])
+  const guestHasJourney = isGuest && hasGuestJourney() 
+
   // Intentional console easter egg for travelers approaching their journey.
   useEffect(() => {
     console.info(
@@ -31,6 +40,25 @@ function GameEntryPage() {
       'color: #c8ba96; font-weight: bold;',
     )
   }, [])
+
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+
+    async function loadJourneys() {
+      const currentJourneys = await getJourneys()
+      setJourneys(currentJourneys)
+    }
+
+    void loadJourneys()
+  }, [user])
+
+  if (isLoading) {
+    return null
+  }
+
+  const hasJourney = journeys.length > 0
 
   return (
     <EntryLayout
@@ -58,15 +86,21 @@ function GameEntryPage() {
           type="button"
           className="entry-primary-action"
         >
-          Start New Game
+          {guestHasJourney
+            ? 'Continue Game'
+            : isGuest
+                ? 'Start Game'
+                : 'Start New Game'}
         </button>
 
-        <button
-          type="button"
-          className="entry-secondary-action"
-        >
-          Continue Game
-        </button>
+        {hasJourney && (
+          <button
+            type="button"
+            className="entry-secondary-action"
+          >
+            Continue Game
+          </button>
+        )}
       </div>
     </EntryLayout>
   )

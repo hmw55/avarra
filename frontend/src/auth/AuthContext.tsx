@@ -8,12 +8,15 @@ type AuthProviderProps = {
   children: ReactNode
 }
 
+const GUEST_MODE_STORAGE_KEY = 'avarra.guestMode'
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<CurrentUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isGuest, setIsGuest] = useState(false)
 
   function continueAsGuest() {
+    sessionStorage.setItem(GUEST_MODE_STORAGE_KEY, 'true')
     setUser(null)
     setIsGuest(true)
   }
@@ -26,6 +29,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsGuest(false)
       } catch {
         setUser(null)
+        setIsGuest(sessionStorage.getItem(GUEST_MODE_STORAGE_KEY) === 'true')
       } finally {
         setIsLoading(false)
       }
