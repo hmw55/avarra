@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage'
 import GameEntryPage from './pages/GameEntryPage'
 import AboutPage from './pages/AboutPage'
 import LorePage from './pages/LorePage'
+import NewJourneyPage from './pages/NewJourneyPage'
+import JourneyLorePage from './pages/JourneyLorePage'
 import './App.css'
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
       <Route path="/journeys" element={<GameEntryPage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/lore" element={<LorePage />} />
+      <Route path="/journeys/new" element={<NewJourneyPage />} />
+      <Route path="/journeys/new/lore" element={<JourneyLorePage />} />
     </Routes>
   )
 }

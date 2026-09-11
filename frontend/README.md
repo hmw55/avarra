@@ -70,16 +70,27 @@ Enter Avarra
   ├── Create Account
   └── Continue as Guest
           ↓
-      Journeys
+       Journeys
           ↓
-   New Journey Flow
-          ↓
-     Gameplay
+   Prepare Journey
+      ├── Explore Avarra
+      │      ├── Continent
+      │      ├── History
+      │      ├── Mana
+      │      └── Kingdoms
+      │
+      └── Choose Character
+             ↓
+        Future Gameplay
 ```
 
-The new-journey and gameplay flows are still under development.
+`/journeys` is the entry point for selecting whether to begin or continue a journey.
 
-`/journeys` represents journey selection and preparation rather than active gameplay. Routes under `/play` are reserved for the eventual gameplay interface.
+Starting a new journey leads to `/journeys/new`, which serves as the preparation screen before character selection. Players may optionally explore preparation-specific lore at `/journeys/new/lore`.
+
+Entering the preparation flow does not create a persisted journey. Journey creation will only occur when the application reaches a meaningful save boundary.
+
+`/play` remains reserved for the eventual gameplay interface.
 
 ---
 
@@ -91,7 +102,19 @@ Frontend requests include credentials so the browser session cookie can be used 
 
 On application startup, the authentication provider checks the current session and restores the authenticated user when one exists.
 
-Guest play does not require an account. Guest persistence and save-state management will be implemented separately from registered-player sessions.
+Guest play does not require an account.
+
+Guest mode is tracked separately from authenticated account state. The current browser session remembers when the player has chosen guest mode so that refreshing a pre-game page does not incorrectly return the interface to registered-player behavior.
+
+Guest journey persistence is also separate from guest session state. Guest journeys use a versioned browser-local save representation rather than the registered-user Journey API.
+
+This separation is intentional:
+
+- Authentication state identifies a registered session.
+- Guest-mode state identifies that the current browser session is playing without an account.
+- Guest journey state represents the actual browser-local save.
+
+Registered and guest persistence will remain separate unless a future account-import or attachment flow explicitly connects them.
 
 ### Account Recovery
 
@@ -114,11 +137,17 @@ This includes screens such as:
 - Login
 - Registration
 - Journey selection
+- Journey preparation
+- Preparation lore
 - About
-- Lore
-- Future character and class selection
+- Public lore
+- Future character selection
 
 `EntryLayout` owns the common presentation shell, including the background, framed content panel, navigation, and footer. Individual pages provide their own content and behavior.
+
+Preparation-specific lore uses a separate route from the public lore interface. `/lore` remains the general public-facing lore page, while `/journeys/new/lore` supports optional learning during journey preparation.
+
+Scrollable game-styled panels use the reusable `GameScrollPanel` component. It provides custom scroll controls designed to match Avarra's interface rather than relying on the browser's native scrollbar presentation.
 
 The eventual gameplay client will intentionally use a different full-screen interface rather than `EntryLayout`.
 
@@ -153,9 +182,11 @@ src/
 │   ├── backgrounds/
 │   └── ui/
 ├── auth/                Authentication API, state, and types
+├── journey/             Journey API and guest journey persistence
 ├── components/
 │   ├── layout/          Shared page layouts
-│   └── navigation/      Shared navigation components
+│   ├── navigation/      Shared navigation components
+│   └── ui/              Reusable game-styled interface components
 ├── pages/               Route-level page components
 ├── App.tsx              Application routes
 ├── index.css            Global styles
@@ -166,22 +197,61 @@ Components should be introduced when an interface or behavior is genuinely share
 
 ---
 
-## Current Journey-State Limitations
+## Journey State
 
-Journey selection currently uses temporary actions while the save system is being developed.
+Registered and guest journeys deliberately use different persistence paths.
 
-The intended behavior is:
+### Registered Players
 
-- Registered players may eventually maintain multiple journeys.
-- "Continue Game" should only appear when an existing save is available.
-- Guest players will have one locally persisted journey at a time.
-- A guest with an existing journey should continue that journey rather than
-  create additional saves.
-- Registered and guest save state will remain separate from authentication
-  state.
+Registered players retrieve their existing journeys from:
 
-These behaviors will be implemented with the game save system rather than
-simulated in the current frontend.
+```text
+GET /api/journeys
+```
+
+The frontend uses the returned journey collection to determine whether an existing registered-user journey is available.
+
+The intended long-term model allows registered players to maintain multiple journeys.
+
+Journey creation is not yet implemented.
+
+### Guest Players
+
+Guest players may maintain one browser-local journey.
+
+Guest journey data uses a versioned local-storage representation and does not use the registered-user Journey API.
+
+The current guest journey representation establishes the persistence boundary but does not yet contain gameplay state.
+
+Guest-mode session state is maintained separately from the guest journey itself.
+
+### Current Limitations
+
+The following behavior remains intentionally incomplete:
+
+- Registered Journey creation
+- Character selection
+- Character persistence
+- Actual game-state persistence
+- Loading an existing Journey into gameplay
+- Guest-to-account Journey import or attachment
+- Full registered-user save management
+
+Opening `/journeys/new` does not create a registered or guest save. Preparation is not itself considered a persisted journey.
+
+---
+
+## Shared Game UI
+
+Reusable game-styled interface behavior belongs under `components/ui/`.
+
+`GameScrollPanel` provides a framed scrollable content region with custom up/down controls, a synchronized scrollbar thumb, and draggable thumb behavior.
+
+The component was introduced for preparation lore but is intentionally reusable for future entry screens and in-game panels that require contained scrolling.
+
+The eventual main gameplay viewport is not expected to use ordinary page scrolling. Individual gameplay panels may use components such as `GameScrollPanel` when their content requires independent scrolling.
+
+---
 
 ## Console Easter Eggs
 
