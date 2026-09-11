@@ -20,6 +20,9 @@ import org.springframework.security.core.Authentication;
 
 import dev.hollandwesley.avarra.journey.service.JourneyService;
 
+/**
+ * Tests the Journey HTTP API contract for authenticated journey retrieval.
+ */
 @WebMvcTest(JourneyController.class)
 class JourneyControllerTests {
 
@@ -42,11 +45,15 @@ class JourneyControllerTests {
                                 "Stonewake",
                                 createdAt,
                                 updatedAt)));
+
+        // @WebMvcTest does not load the application's full SecurityConfig.
+        // Supply the Authentication principal directly so the controller receives
+        // the same username it would receive from an authenticated request.
         Authentication authentication =
-        UsernamePasswordAuthenticationToken.authenticated(
-                "Mack_98",
-                null,
-                List.of());
+                UsernamePasswordAuthenticationToken.authenticated(
+                        "Mack_98",
+                        null,
+                        List.of());
         mockMvc.perform(get("/api/journeys")
                 .principal(authentication))
                 .andExpect(status().isOk())

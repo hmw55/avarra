@@ -19,6 +19,10 @@ import dev.hollandwesley.avarra.journey.persistence.JourneyRepository;
 import dev.hollandwesley.avarra.user.domain.User;
 import dev.hollandwesley.avarra.user.persistence.UserRepository;
 
+/**
+ * Tests Journey service behaviors for retrieving registered-user journeys
+ * and handling authenticated users that cannot be resolved.
+ */
 @ExtendWith(MockitoExtension.class)
 class JourneyServiceTests {
 

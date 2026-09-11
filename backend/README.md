@@ -4,7 +4,7 @@ The Avarra backend is a Java and Spring Boot application responsible for server-
 
 Avarra is being developed as a persistent single-player browser-based fantasy tabletop RPG. The backend is designed to keep account, game, and persistence concerns on the server while exposing a REST API to the frontend.
 
-> **Current development status:** The backend currently includes the database and authentication foundations. Game domain systems will be introduced incrementally as development progresses.
+> **Current development status:** The backend currently includes the database and authentication foundations, registered-user Journey persistence, and the initial Journey read API. Additional game domain systems will be introduced incrementally as development progresses.
 
 ---
 
@@ -44,6 +44,11 @@ dev.hollandwesley.avarra
 │   ├── application/   Authentication and account-related application use cases
 │   ├── security/      Spring Security configuration and authentication security services
 │   └── validation/    Validation rules currently owned by authentication inputs
+├── journey/
+│   ├── api/           Journey HTTP endpoints and response models
+│   ├── domain/        Journey persistence domain model
+│   ├── persistence/   Journey database access
+│   └── service/       Journey application behavior
 ├── user/
 │   ├── domain/        User account domain model
 │   └── persistence/   User account database access
@@ -108,7 +113,11 @@ Open Session in View is disabled. Persistence work should be completed within in
 
 Migration files are immutable after they become part of the project's migration history. Changes to an existing schema should be introduced through a new migration rather than by editing a previously applied migration.
 
-The initial migration establishes the registered user account schema.
+The database currently includes persistence foundations for registered user accounts and registered-user Journeys. Additional persistence domains will be introduced incrementally as their corresponding game systems are implemented.
+
+For the current schema, migration history, relationships, and database conventions, see:
+
+`src/main/resources/db/migration/README.md`
 
 ---
 
@@ -134,6 +143,27 @@ Authentication is deliberately separated from future game-character identity. A 
 
 ---
 
+## Journey Persistence
+
+Avarra treats the user account, character identity, Journey/save, and eventual game state as separate concepts.
+
+A registered User may have zero or more Journeys. The current Journey domain provides only the minimum persistence foundation needed to identify a saved Journey and associate it with its owning account.
+
+The current Journey model includes:
+
+- A UUID identifier
+- The owning registered User
+- An optional Journey name
+- Creation and update timestamps
+
+Character selection, kingdom choice, game state, progress, and other gameplay data are intentionally not part of the current Journey model. Those fields will be introduced only when the corresponding systems are implemented.
+
+Registered Journeys are persisted in PostgreSQL.
+
+Guest journeys are separate from registered Journeys and are not persisted through the backend Journey table. Guest save data is intended to remain browser-local until a future account-import or attachment flow is implemented.
+
+---
+
 ## Current Authentication Endpoints
 
 | Method | Endpoint | Authentication Required | Purpose |
@@ -147,6 +177,25 @@ Authentication is deliberately separated from future game-character identity. A 
 Account recovery, persistent login, and final production deployment hardening are planned but are not part of the current implementation.
 
 More detailed authentication documentation is maintained with the authentication package.
+
+---
+
+## Current Journey Endpoints
+
+| Method | Endpoint | Authentication Required | Purpose |
+|--------|----------|-------------------------|---------|
+| `GET` | `/api/journeys` | Yes | Return Journey summaries belonging to the currently authenticated registered user |
+
+The Journey read API resolves ownership from the authenticated Spring Security principal rather than accepting a user ID from the client.
+
+The current response contains:
+
+- Journey ID
+- Optional Journey name
+- Creation timestamp
+- Update timestamp
+
+Journey creation is intentionally not implemented yet. Entering the frontend Journey preparation flow does not create a persisted Journey.
 
 ---
 
@@ -217,6 +266,9 @@ The test suite currently covers multiple layers of the application, including:
 
 - Request validation
 - User persistence
+- Journey persistence
+- Journey lookup by registered user
+- Journey read API behavior
 - Password hashing
 - Recovery-code generation
 - User registration behavior
@@ -257,7 +309,7 @@ Important classes, public APIs, security behavior, and non-obvious architecture 
 
 ## Current Development Boundary
 
-The registered-user authentication foundation is now complete through logout.
+The registered-user authentication foundation is complete through logout, and the first Journey persistence and read-only API foundation is now in place.
 
 Current authentication progress:
 
@@ -270,9 +322,26 @@ Current user (/me)  Complete
 Logout              Complete
 ```
 
-The backend authentication foundation is now ready for local frontend integration. CSRF-token retrieval, local credentialed CORS, logout behavior, unauthenticated API responses, and session-related security behavior are in place and covered by automated tests.
+The frontend is now integrated with the authentication foundation for registered-user and guest entry flows.
 
-The next authentication work should occur alongside the React frontend integration rather than through additional speculative backend hardening.
+The backend currently also supports:
+
+```text
+Journey table and migration      Complete
+Journey persistence entity       Complete
+Journey repository               Complete
+Registered-user Journey lookup   Complete
+GET /api/journeys                Complete
+Journey creation API             Deferred
+Character persistence            Deferred
+Game-state persistence           Deferred
+```
+
+`GET /api/journeys` is currently the only Journey endpoint. It returns Journeys belonging to the authenticated registered user.
+
+Journey creation is intentionally deferred. Entering the frontend preparation flow does not create a Journey, because preparation alone does not yet represent a persisted game save.
+
+Guest journeys remain outside the backend Journey persistence model. Guest save state is intended to remain browser-local and versioned separately from registered-user saves.
 
 The following authentication capabilities remain intentionally deferred:
 

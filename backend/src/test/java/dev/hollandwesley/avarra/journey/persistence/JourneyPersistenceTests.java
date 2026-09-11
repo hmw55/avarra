@@ -15,6 +15,11 @@ import dev.hollandwesley.avarra.journey.domain.Journey;
 import dev.hollandwesley.avarra.user.domain.User;
 import dev.hollandwesley.avarra.user.persistence.UserRepository;
 
+
+/**
+ * Tests Journey persistence and registered-user ownership queries
+ * against the configured PostgreSQL database.
+ */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional

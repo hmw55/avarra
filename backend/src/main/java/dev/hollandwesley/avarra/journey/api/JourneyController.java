@@ -2,10 +2,10 @@ package dev.hollandwesley.avarra.journey.api;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.core.Authentication;
 
 import dev.hollandwesley.avarra.journey.service.JourneyService;
 
@@ -22,6 +22,12 @@ public class JourneyController {
         this.journeyService = journeyService;
     }
 
+    /**
+     * Returns journey summaries belonging to the authenticated user.
+     *
+     * @param authentication the current authenticated Spring Security principal
+     * @return the authenticated user's journeys
+     */
     @GetMapping
     public List<JourneySummaryResponse> getJourneys(Authentication authentication) {
         return journeyService.getJourneysForUser(authentication.getName());
