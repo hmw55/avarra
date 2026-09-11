@@ -180,6 +180,90 @@
   text-decoration: none;
 }
 
+
+.game-scroll-panel {
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+  border: 2px solid #5f5748;
+  background: #403b30;
+  box-shadow:
+    inset 0 0 0 1px #211f1a,
+    0 0 0 1px #211f1a;
+}
+
+.game-scroll-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.game-scroll-content::-webkit-scrollbar {
+  display: none;
+}
+
+.game-scroll-controls {
+  display: flex;
+  width: 22px;
+  flex-shrink: 0;
+  flex-direction: column;
+  margin: 0;
+  border-left: 2px solid #5f5748;
+  background: #292720;
+}
+
+.game-scroll-arrow {
+  display: flex;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: #403b30;
+  color: #b8ad91;
+  font-size: 0.65rem;
+  cursor: pointer;
+}
+
+.game-scroll-arrow:first-child {
+  border-bottom: 1px solid #5f5748;
+}
+
+.game-scroll-arrow:last-child {
+  border-top: 1px solid #5f5748;
+}
+
+.game-scroll-arrow:hover {
+  background: #514b3d;
+  color: #e2c77f;
+}
+
+.game-scroll-track {
+  position: relative;
+  flex: 1;
+  margin: 2px;
+  border: 1px solid #403b30;
+  background: #211f1a;
+}
+
+.game-scroll-thumb {
+  position: absolute;
+  top: 0;
+  right: 1px;
+  left: 1px;
+  min-height: 24px;
+  border: 1px solid #5f5748;
+  background: #756b57;
+  cursor: grab;
+}
+
+.game-scroll-thumb:active {
+  cursor: grabbing;
+}
+
+
 @media (max-width: 600px) {
   .home {
     padding: 1.5rem 1rem;

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import EntryLayout from '../components/layout/EntryLayout'
 import { getJourneys } from '../journey/journeyApi'
 import type { JourneySummary } from '../journey/journeyApi'
@@ -30,6 +31,7 @@ import { hasGuestJourney } from '../journey/guestJourneyStorage'
 function GameEntryPage() {
 
   const { user, isGuest, isLoading } = useAuth()
+  const navigate = useNavigate()
   const [journeys, setJourneys] = useState<JourneySummary[]>([])
   const guestHasJourney = isGuest && hasGuestJourney() 
 
@@ -85,6 +87,7 @@ function GameEntryPage() {
         <button
           type="button"
           className="entry-primary-action"
+          onClick={() => navigate('/journeys/new')}
         >
           {guestHasJourney
             ? 'Continue Game'

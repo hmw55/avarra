@@ -458,6 +458,62 @@
   margin: 0.4rem 0 0;
 }
 
+/* ---------- Lore Tabs ---------- */
+
+.lore-tabs {
+  display: flex;
+  width: 100%;
+  margin-top: 1.5rem;
+  gap: 0;
+  border-bottom: 2px solid #5f5748;
+}
+
+.lore-tab {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: 1px solid #5f5748;
+  border-bottom: none;
+  background: #292720;
+  color: #b8ad91;
+  font: inherit;
+  cursor: pointer;
+}
+
+.lore-tab + .lore-tab {
+  border-left: none;
+}
+
+.lore-tab:hover {
+  background: #353229;
+  color: #ddd0ad;
+}
+
+.lore-tab-active {
+  position: relative;
+  background: #403b30;
+  color: #e2c77f;
+}
+
+.lore-tab-active::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  background: #403b30;
+}
+
+/* ---------- Lore Content ---------- */
+
+.lore-content h2 {
+  margin-top: 0;
+}
+
+.lore-scroll-panel {
+  height: 18rem;
+}
+
 /* ---------- Keyboard Focus ---------- */
 
 .entry-brand:focus-visible,
